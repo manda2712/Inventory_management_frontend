@@ -39,7 +39,8 @@ export default {
         return {
             users: [
                 { id: 1, nama: "John Doe", email: "john@example.com", role: "Admin" },
-                { id: 2, nama: "Jane Smith", email: "jane@example.com", role: "User" }
+                { id: 2, nama: "Jane Smith", email: "jane@example.com", role: "User" },
+                { id: 2, nama: "Amanda", email: "amanda@gmail.com", role: "User" }
             ],
             showForm: false,
             selectedUser: null,

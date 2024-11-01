@@ -54,7 +54,7 @@ header {
     padding: 10px 20px;
     display: flex;
     align-items: center;
-    height: 60px;
+    height: 50px;
     width: calc(100% - 180px);
     position: fixed;
     top: 0;

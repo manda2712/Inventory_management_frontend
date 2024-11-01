@@ -11,6 +11,7 @@
     "@popperjs/core": "^2.11.8",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
     "core-js": "^3.8.3",
     "mitt": "^3.0.1",
     "pinia": "^2.1.4",
@@ -18,8 +19,9 @@
     "vue-router": "^4.0.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.16",
+    "@babel/core": "^7.26.0",
     "@babel/eslint-parser": "^7.12.16",
+    "@babel/preset-env": "^7.26.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",

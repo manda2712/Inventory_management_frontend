@@ -86,7 +86,7 @@ form {
 }
 h2 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 200px;
 }
 label {
     margin-top: 10px;
