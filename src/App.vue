@@ -8,83 +8,71 @@
     />
     <div class="app-content">
       <SidebarNav
-      :currentRole="currentRole"
-      :isSidebarVisible="isSidebarVisible"
-      @showComponent="navigateTo"
-    />
+        :currentRole="currentRole"
+        :isSidebarVisible="isSidebarVisible"
+        @showComponent="navigateTo"
+      />
       <div class="main-content" :class="{ expanded: isSidebarVisible }">
-        <component
-          :is="currentView"
-          :currentComponent="currentComponent"
-          @add-user="handleAddUser"
-          @edit-user="handleEditUser"
-          @delete-user="handleDeleteUser"
-          @add-item="handleAddItem"
-          @edit-item="handleEditItem"
-          @delete-item="handleDeleteItem"
+        <!-- Tetap menggunakan <route-view> -->
+        <router-view 
+        :key="$route.fullPath" 
+        :currentComponent="$route.params.component"
         />
+
       </div>
     </div>
   </div>
 </template>
 
 <script>
+
+
 import HeaderNav from "./components/dashboard/HeaderNav.vue";
 import SidebarNav from "./components/dashboard/SidebarNav.vue";
-import AdminView from "./views/AdminView.vue";
-import UserView from "./views/UserView.vue";
 import { EventBus } from '@/utils/EventBus'; 
 
 export default {
   components: {
     HeaderNav,
     SidebarNav,
-    AdminView,
-    UserView,
   },
   data() {
-    const params = new URLSearchParams(window.location.search);
     return {
-      currentRole: params.get("role") || "admin",
-      currentComponent: params.get("component") || "items",
-      isSidebarVisible: params.get("sidebar") !== "hidden",
+      currentRole: this.$route.name || "admin",
+      isSidebarVisible: true,
+      searchTerm: "",
     };
   },
-  computed: {
-    currentView() {
-      return this.currentRole === "admin" ? AdminView : UserView;
+  watch: {
+    "$route.name"(newRole) {
+      this.currentRole = newRole;
     },
   },
   methods: {
     updateRole(role) {
       this.currentRole = role;
-      this.navigateTo("items");
+      this.navigateTo("item");
     },
-    navigateTo(component ){
-      this.currentComponent = component;
-      this.updateURLParams();
+    navigateTo(component) {
+      this.$router.push({ name: this.currentRole, params: { component } });
     },
     toggleSidebar() {
       this.isSidebarVisible = !this.isSidebarVisible;
-      this.updateURLParams();
     },
-    updateURLParams() {
-      const params = new URLSearchParams();
-      params.set("role", this.currentRole);
-      params.set("component", this.currentComponent);
-      params.set("sidebar", this.isSidebarVisible ? "visible" : "hidden");
-      window.history.replaceState(
-      {}, 
-      "", 
-      `${window.location.pathname}?${params}`
-      );
+    handleSearch(newQuery) {
+      console.log("Search term:", newQuery);
+      if (this.currentRole === "admin") {
+        console.log("Search in admin items");
+      } else if (this.currentRole === "user") {
+        console.log("Search in user items");
+      }
     },
   },
   mounted() {
-    EventBus.on('search', this.handleSearch);
+    EventBus.on("search", this.handleSearch);
   },
   beforeUnmount() {
-    EventBus.off('search', this.handleSearch);
+    EventBus.off("search", this.handleSearch);
   },
 };
 </script>
@@ -94,6 +82,7 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  margin-top: 30px;
 }
 .app-content {
   display: flex;
@@ -107,5 +96,6 @@ export default {
 }
 .main-content.expanded {
   margin-left: 200px;
+ 
 }
 </style>

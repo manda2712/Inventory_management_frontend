@@ -6,10 +6,13 @@
                 <input type="text" v-model="search" placeholder="Search" class="search-bar" />
             </div>
             <div class="role-selection">
-                <button @click="selectRole('admin')" :class="{ active: currentRole === 'admin' }">Admin</button>
-                <button @click="selectRole('user')" :class="{ active: currentRole === 'user' }">User</button>
+                <button @click="selectRole('admin')" :class="{ active: currentRole === 'admin' }" class="btn btn-secondary">Admin</button>
+                <button @click="selectRole('user')" :class="{ active: currentRole === 'user' }" class="btn btn-secondary">User</button>
             </div>
-        </div>
+                <div class="logout-container">
+                    <button class="logout-btn btn btn-outline-light" @click="logout">Logout</button>
+                </div>
+            </div>
     </header>
 </template>
 
@@ -40,11 +43,30 @@ export default {
     methods: {
         selectRole(role) {
             this.$emit('update-role', role);
+            const authRole = localStorage.getItem("role");
+            const isAuthenticated = Boolean(localStorage.getItem("auth"));
+            if (isAuthenticated && authRole === role) {
+                this.$router.push({ name: role, params: { components: "items" } });
+            } else {
+                alert("You do not have permission to switch to this role.");
+                this.$router.push({ name: "login" });
+                this.$emit("toggle-sidebar", false);
+            }
         },
         toggleSidebar() {
             this.$emit('toggle-sidebar');
-        }
-    }
+        },
+        emitSearch() {
+            EventBus.emit("search", this.search);
+        },
+        logout() {
+            localStorage.removeItem("auth");
+            localStorage.removeItem("role");
+            this.$emit("update-role", "admin");
+            this.$emit("toggle-sidebar", false);
+            this.$router.push({ name: "login" });
+        },
+    },
 };
 </script>
 
@@ -102,6 +124,21 @@ header.expanded {
     background-color: #4b3f6b;
     padding: 10px;
 }
+.logout-container {
+    display: flex;
+    align-items: center;
+}
+.logout-btn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+.logout-btn:hover {
+    background-color: #6b5bb8;
+}
 button {
     margin: 0 10px;
     padding: 5px 10px;
@@ -131,8 +168,23 @@ button.active {
         margin-bottom: 10px;
         margin-top: 16px;
     }
+    .search-bar {
+        width: 100%; 
+        padding: 10px;
+    }
+    .role-selection {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .logout-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
     .toggle-btn {
-        display: block;
+        margin-bottom: 4px ;
     }
 }
 </style>

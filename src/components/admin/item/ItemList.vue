@@ -1,17 +1,17 @@
 <template>
-    <div class="item-list container py-4">
+    <div class="item-list container py-4 bg-white rounded shadow-sm">
         <div class="header d-flex justify-content-between align-items-center mb-3">
             <h2>Daftar Barang</h2>
             <button class="btn btn-primary" @click="showAddForm">Tambah Item</button> 
         </div>
-        <div class="item-cards rows d-flex">
+        <div class="item-cards row">
             <ItemCard 
                 v-for="item in items" 
                 :key="item.kode" 
                 :item="item" 
                 @edit-item="editItem" 
-                @delete-item="confirmDeleteItem" 
-                class="col-md-6 col-lg-4"
+                @delete-item="deleteItem(item.kode)" 
+                class="col-md-6 mb-4"
             />
         </div>
         <AllModal :visible="showForm" @close="cancelEditForm">
@@ -23,13 +23,14 @@
             />
         </AllModal>
     </div>
-
 </template>
 
 <script>
 import ItemCard from "./ItemCard.vue";
 import AllModal from "@/components/AllModal.vue";
 import ItemForm from "./ItemForm.vue";
+import { useItemStore } from "@/store/itemStore";
+import { EventBus } from "@/utils/EventBus";
 
 export default {
     components: {
@@ -39,25 +40,24 @@ export default {
     },
     data() {
         return {
-            items: [
-                {
-                    kode: "2024001",
-                    nama: "Acer Nitro 15 AN515-58",
-                    deskripsi: "Intel Core i5 12500H, RTX 3050, RAM 8GB DDR4, LAYAR 15.6",
-                    stok: 80,
-                },
-                {
-                    kode: "2024002",
-                    nama: "Lenovo LOQ 15 15IRH8",
-                    deskripsi: "Intel Core i5 13450H, RTX 3050, RAM 8GB DDR4, LAYAR 15.6",
-                    stok: 80,
-                },
-               
-            ],
             showForm: false,
             selectedItem: null,
             isEdit: false,
+            searchQuery: "",
         };
+    },
+    computed : {
+        items() {
+            return this.itemStore.items;
+        },
+        filteredItem() {
+            return this.items.filter((item) =>{
+                return(
+                    item.kode.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                    item.nama.toLowerCase().includes(this.searchQuery.toLowerCase())
+                );
+            });
+        },
     },
     methods: {
         showAddForm() {
@@ -71,6 +71,7 @@ export default {
             this.showForm = true;
         },
         handleSubmit(item) {
+            const itemStore = useItemStore()
             if (
                 item.kode &&
                 item.nama &&
@@ -79,10 +80,9 @@ export default {
                 !isNaN(item.stok) 
             ) {
                 if (this.isEdit) {
-                    const index = this.items.findIndex(i => i.kode === item.kode);
-                    this.items[index] = item;
+                    itemStore.updateItem(item)
                 } else {
-                    this.items.push(item);
+                    itemStore.addItem(item);
                 }
             }
             this.showForm = false;
@@ -90,29 +90,45 @@ export default {
         cancelEditForm() {
             this.showForm = false;
         },
-        confirmDeleteItem(item) {
-            if (confirm(`Apakah Anda yakin ingin menghapus ${item.nama}?`)) {
-                this.deleteItem(item.kode);
-            }
-        },
+
         deleteItem(kode) {
-            this.items = this.items.filter(item => item.kode !== kode);
+            const itemStore = useItemStore(); // Akses store
+            itemStore.deleteItem(kode);      // Hapus item di store
         },
+        handleSearch(query) {
+            this.searchQuery = query;
+        },
+        mounted() {
+            EventBus.on("search", this.handleSearch);
+        },
+        beforeUnmount() {
+            EventBus.off("search", this.handleSearch);
+        },
+    },
+    setup() {
+        const itemStore = useItemStore();
+        return { itemStore };
     },
 };
 </script>
 
 <style scoped>
-.item-list{
-    background-color: white;
+.item-list {
+    background-color: #fff;
     border-radius: 8px;
-    margin: 50px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1)
+    margin: 25px 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
-.header h2{
+.header h2 {
     color: #4b3f6b;
     font-size: 24px;
-
+}
+.header .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.header .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
 }
 </style>
