@@ -1,64 +1,70 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import AdminView from '@/views/AdminView.vue'
-import UserView from '@/views/UserView.vue'
-// import { meta } from '@babel/eslint-parser'
-import LoginView from '@/views/LoginView.vue'
+import AdminView from "../views/AdminView.vue";
+import UserView from "../views/UserView.vue";
+import HomeView from '../views/HomeView.vue';
+
+import { useAuthStore } from '@/store/authStore';
+import UserLogin from '@/components/auth/UserLogin.vue';
+import UserRegister from '@/components/auth/UserRegister.vue';
 
 const routes = [
   {
-    path: '/admin/:component',
+    path: "/",
+    name: "home",
+    component: HomeView,
+    meta: { hideHeader: true, hideSidebar: true },
+    children: [
+      {
+        path: "login",
+        name: "login",
+        components: UserLogin,
+      },
+      {
+        path: "register",
+        name: "register",
+        components: UserRegister,
+      },
+    ],
+  },
+  {
+    path: '/admin/:component?',
     name: 'admin',
     component: AdminView,
-    props : true,
-    meta: {
-      requiresAuth : true,
-      role: 'admin'
-    }
-  },
+    props: true,
+    meta: { requiresAuth: true, role: "ADMIN" },
+    },
   {
-    path: '/user/:component',
-    name : 'user',
+    path: '/user/:component?',
+    name: 'user',
     component: UserView,
     props: true,
-    meta :{
-      requiresAuth : true,
-      role: 'user'
-    }
+    meta: { requiresAuth: true, role: "USER" },
   },
-  {
-    path : "/login",
-    name : "login",
-    component: LoginView,
-  },
-  {
-    path: '/',
-    redirect : {'name' : 'admin', params : {component: 'item'}}, 
-  }
-
-]
-
+];
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
-})
+});
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem("auth");
-  const userRole = localStorage.getItem("role");
+  const authStore = useAuthStore();
+  const isAuthenticated = !!authStore.token;
+  const userRole = authStore.role;
 
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next({ name: "login" });
-  } else if (to.meta.requiresAuth && isAuthenticated) {
-    // Pastikan userRole ada sebelum membandingkannya
-    if (userRole && to.meta.role !== userRole) {
-      alert("You're Not Authorized to Access This Page");
-      next(false);
+  if (to.meta.requiresAuth) {
+    if (isAuthenticated) {
+      if (userRole === to.meta.role || to.meta.role === undefined)
+      {
+        next();
+      } else {
+        next({ name: "home"});
+      }
     } else {
-      next();
+      next({ name: "home"});
     }
   } else {
     next();
   }
 });
 
-export default router
+export default router;

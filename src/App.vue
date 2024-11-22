@@ -1,13 +1,15 @@
 <template>
   <div id="app">
     <HeaderNav
+      v-if = "showHeader"
       :currentRole="currentRole"
       @update-role="updateRole"
       @toggle-sidebar="toggleSidebar"
       :isSidebarVisible="isSidebarVisible"
     />
-    <div class="app-content">
+    <div class="app-content" :class="{ noHeader: !showHeader}">
       <SidebarNav
+        v-if="showSidebar"
         :currentRole="currentRole"
         :isSidebarVisible="isSidebarVisible"
         @showComponent="navigateTo"
@@ -42,6 +44,14 @@ export default {
       isSidebarVisible: true,
       searchTerm: "",
     };
+  },
+  computed: {
+    showHeader() {
+      return !this.$route.meta.hideHeader;
+    },
+    showSidebar() {
+      return !this.$route.meta.hideSidebar;
+    },
   },
   watch: {
     "$route.name"(newRole) {
@@ -82,7 +92,6 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  margin-top: 30px;
 }
 .app-content {
   display: flex;
@@ -90,12 +99,9 @@ export default {
 }
 .main-content {
   flex: 1;
-  padding: 20px;
+  
   background-color: #ffffff;
   transition: margin-left 0.3s ease;
 }
-.main-content.expanded {
-  margin-left: 200px;
- 
-}
+
 </style>
