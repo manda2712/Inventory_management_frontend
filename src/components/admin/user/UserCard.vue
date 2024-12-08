@@ -1,6 +1,6 @@
 <template>
     <div class="user-card">
-        <h3>{{ user.nama }}</h3> <!-- Ubah dari user.name ke user.nama -->
+        <h3>{{ user.username }}</h3> <!-- Ubah dari user.name ke user.nama -->
         <p>Email: {{ user.email }}</p>
         <p class="role">Role: {{ user.role }}</p>
         <div class="buttons">

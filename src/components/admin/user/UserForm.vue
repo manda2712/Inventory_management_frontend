@@ -1,136 +1,163 @@
 <template>
-    <div>
-        <form @submit.prevent="submitForm">
-            <table>
-                <tbody>
-                <tr>
-                    <td>ID Pengguna</td>
-                    <td>
-                        <input type="text" v-model="form.id" id="id" :disabled="isEdit" required/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Nama Pengguna</td>
-                    <td>
-                        <input type="text" v-model="form.nama" id="nama" required />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Email</td>
-                    <td>
-                        <input type="email" v-model="form.email" id="email" required />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Role</td>
-                    <td>
-                        <select v-model="form.role" required>
-                            <option value="" disabled>Pilih role</option>
-                            <option value="Admin">Admin</option>
-                            <option value="User">User</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Password</td>
-                    <td>
-                        <input type="password" v-model="form.password" id="password" required />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <button type="submit">{{ isEdit ? "Simpan Perubahan" : "Tambah Pengguna" }}</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </form>
-    </div>
-</template>
-
-<script>
-export default {
+    <form @submit.prevent="submitForm" class="user-form">
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+  
+        <input
+          type="text"
+          v-model="form.username"
+          id="username"
+          class="form-control"
+          required
+        />
+      </div>
+  
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+  
+        <input
+          type="email"
+          v-model="form.email"
+          id="email"
+          class="form-control"
+          required
+        />
+      </div>
+  
+      <div v-if="!isEdit" class="mb-3">
+        <label for="password" class="form-label">Password</label>
+  
+        <input
+          type="password"
+          v-model="form.password"
+          id="password"
+          class="form-control"
+          required
+        />
+      </div>
+  
+      <div v-if="!isEdit" class="mb-3">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+  
+        <input
+          type="password"
+          v-model="form.confirmPassword"
+          id="confirmPassword"
+          class="form-control"
+          required
+        />
+      </div>
+  
+      <div class="mb-3">
+        <label for="role" class="form-label">Role</label>
+  
+        <select v-model="form.role" id="role" class="form-select" required>
+          <option value="ADMIN">ADMIN</option>
+  
+          <option value="USER">USER</option>
+        </select>
+      </div>
+  
+      <div v-if="form.error" class="alert alert-danger">{{ form.error }}</div>
+  
+      <button type="submit" class="btn btn-success w-100">
+        {{ isEdit ? "Simpan Perubahan" : "Tambah Pengguna" }}
+      </button>
+    </form>
+  </template>
+  
+  <script>
+  import axios from "@/plugins/axios";
+  export default {
     props: {
-        user: {
-            type: Object,
-            default: () => ({}),
-        },
-        isEdit: {
-            type: Boolean,
-            default: false,
-        },
+      user: {
+        type: Object,
+        default: () => ({}),
+      },
+      isEdit: {
+        type: Boolean,
+        default: false,
+      },
     },
     data() {
-        return {
-            form: {
-                id: "",
-                nama: "",
-                email: "",
-                password: "",
-                role: "",
-            },
-        };
+      return {
+        form: {
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          role: "USER",
+          error: "",
+        },
+      };
     },
     watch: {
-        user: {
-            immediate: true,
-            handler(newUser) {
-                if (this.isEdit) {
-                    this.form = { ...newUser };
-                } else {
-                    this.form = {
-                        id: "",
-                        nama: "",
-                        email: "",
-                        password: "",
-                        role: "",
-                    };
-                }
-            },
+      user: {
+        immediate: true,
+        handler(newUser) {
+          if (this.isEdit) {
+            this.form = {
+              username: newUser.username,
+              email: newUser.email,
+              role: newUser.role,
+            };
+          } else {
+            this.resetForm();
+          }
         },
+      },
     },
     methods: {
-        submitForm() {
-            if (
-                this.form.id &&
-                this.form.nama &&
-                this.form.email &&
-                this.form.password &&
-                this.form.role
-            ) {
-                this.$emit("submit", this.form);
+      resetForm() {
+        this.form = {
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          role: "USER",
+          error: "",
+        };
+      },
+      async submitForm() {
+        try {
+          if (!this.isEdit) {
+            if (this.form.password !== this.form.confirmPassword) {
+              this.form.error = "Passwords do not match";
+              return;
             }
-        },
+          }
+          this.form.error = "";
+          const payload = {
+            username: this.form.username,
+            email: this.form.email,
+            password: this.form.password,
+            role: this.form.role,
+          };
+          console.log("Sending data to server:", payload);
+          if (this.isEdit) {
+            await axios.patch(`/user/${this.user.id}`, payload);
+          } else {
+            const response = await axios.post("/user", payload);
+            console.log("User created:", response.data);
+          }
+          this.$emit("submit", this.form);
+          this.resetForm();
+        } catch (error) {
+          console.error("Failed to submit form:", error);
+          this.form.error = "Failed to submit form:" + error.message;
+        }
+      },
     },
-    emits: ["submit"],
-};
-</script>
-
-<style scoped>
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-td {
-    padding: 10px;
-    border: 1px solid #ddd;
-}
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-}
-button[type="submit"] {
-    background-color: #4caf50;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-button[type="submit"]:hover {
-    background-color: #45a049;
-}
-</style>
+  };
+  </script>
+  
+  <style scoped>
+  .user-form .form-label {
+    margin-top: 1rem;
+  }
+  
+  .alert {
+    margin-top: 1rem;
+  }
+ 
+  </style>

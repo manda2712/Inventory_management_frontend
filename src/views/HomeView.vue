@@ -1,5 +1,5 @@
 <template>
-    <div class="home-view d-flex flex-column align-items-center justify-content-center min-vh-100 bg-custom text-white">
+    <div class="home-view d-flex flex-column align-items-center text-white">
         <div class="text-center mb-4 welcome-text">
             <h1 class="display-4 fw-bold mb-3">Welcome to Simbok</h1>
             <p class="lead mb-4">
@@ -43,12 +43,13 @@ font-family: "Avenir", Helvetica, Arial, sans-serif;
 background-color: #4b3f6b;
 overflow: auto;
 padding: 20px;
+margin-right: 200px;
 
-}
+
+}   
 .fade-enter-active,
 
 .fade-leave-active {
-
 transition: opacity 0.5s;
 
 }

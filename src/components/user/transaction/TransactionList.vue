@@ -159,7 +159,7 @@ button {
     background-color: #ccc;
     cursor: not-allowed;
 }
-@media (max-width: 600px) {
+@media (max-width: 780px) {
     th,td {
         padding: 8px 10px;
     } 

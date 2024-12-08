@@ -1,18 +1,18 @@
 // export function createPiniaMiddleware() {
 //     return (context) => {
-//         context.store.$onAction(({name, store, args, after, onError}) => {
+//         context.store.$onAction(({ name, store, args, after, onError }) => {
 //             console.log(`Actions "${name}" in store "${store.$id}" with args`, args)
 //         });
 
 //         //proteksi berdasarkan user role
 //         const userRole = localStorage.getItem("role");
 //         const protectedActions = ['addItem', 'updateItem', 'deleteItem'];
-//         if (protectedActions = ['addItem', 'updateItem', 'deleteItem'] && userRole !== 'admin') {
+//         if (protectedActions.includes(name) && userRole !== 'admin') {
 //             console.error('Unauthorize action "${name}" attempted by role "${userRole}"')
 //             throw new Error("UnAuthorize Action")
 //         }
-//         after ((result) => {
-//             console.log('Action "${name}" completed with result:', result)
+//         after((result) => {
+//             console.log(`Action "${name}" completed with result:`, result);
 //         });
 //         onError ((error) =>{
 //             console.error('Actions "${name}" failed with error', error)
@@ -39,8 +39,7 @@ onError((error) => {
 });
 
 });
-};
-    
+};  
 }
 
 // export function createPiniaMiddleware() {

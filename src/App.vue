@@ -88,20 +88,74 @@ export default {
 </script>
 
 <style scoped>
-#app {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+html, body {
+
+height: 100%;
+
+margin: 0;
+
+background-color: #4b3f6b;
+
 }
+
+#app {
+
+height: 100%;
+
+display: flex;
+
+flex-direction: column;
+
+background-color: #4b3f6b;
+
+}
+
 .app-content {
   display: flex;
-  height: 100%;
+  flex-grow: 1;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font: 1em sans-serif;
+  height: calc(100vh - 60px);
+  margin-top: 60px;
+  background-color: #4b3f6b;
 }
+
 .main-content {
-  flex: 1;
-  
-  background-color: #ffffff;
+  flex-grow: 1;
   transition: margin-left 0.3s ease;
+}
+
+.main-content.expanded {
+  margin-left: 200px;
+
+}
+
+.app-content.noHeader {
+
+margin-top: 0;
+
+height: 100vh;
+
+}
+
+@media (max-width: 768px) {
+
+.main-content {
+
+margin-left: 0;
+
+margin-top: 180px;
+
+}
+
+.app-content.noHeader {
+
+margin-top: 0;
+
+height: calc(100vh - 60px);
+
+}
+
 }
 
 </style>

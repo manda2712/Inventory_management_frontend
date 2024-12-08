@@ -18,7 +18,7 @@
                 <label for="confirm-password" class="form-label">Confirm Password</label>
                 <input type="password" id="confirm-password" v-model="confirmPassword" class="form-control" required/>
             </div>
-            <button type="submit" class="btn btn-success w-100">Register</button>
+            <button type="submit" class="btn btn-success w-100" >Register</button>
         </form>
         <div v-if="error" class="alert alert-danger mt-3">{{ error }}</div>
         <div class="mt-3 text-center">
@@ -31,6 +31,7 @@
 
 <script>
 import { register as registerService } from "@/services/authServices";
+import Swal from "sweetalert2";
 export default {
     data() {
         return {
@@ -54,9 +55,13 @@ export default {
                     this.password
                 );
                 console.log("Regitration successful:", response);
-                alert("Registration successful!");
+                Swal.fire({
+                    title: "Success!",
+                    text: "Registration successful!",
+                    icon: "success",
+                });
 
-                this.$emit("switch", "Login");
+                this.$emit("switch", "UserLogin");
             } catch (error) {
                 this.error = error.message;
                 console.error("Registration failed:", error.message);
